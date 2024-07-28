@@ -1,0 +1,468 @@
+openapi: 3.0.0
+info:
+  title: MongoDBtest
+  description: API dokumentáció a felhasználók, könyvek és értékelések kezeléséhez
+servers:
+  - url: http://localhost:5050
+paths:
+#Bejelentkezés
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Felhasználó bejelentkezés
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Sikeres bejelentkezés
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+        '401':
+          description: Nem létezik ilyen felhasználó vagy rossz bejelentkezési adatot adtál meg 
+#Felhasználók kezelése
+  /users:
+    get:
+      tags: 
+        - Users
+      summary: Felhasználók lekérése
+      description: Lekérdezi az összes felhasználót
+      responses:
+        '200':
+          description: Sikeresen visszaadott felhasználók
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      tags:
+        - Users
+      summary: Új felhasználó létrehozása
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        '201':
+          description: A felhasználó sikeresen létrehozva
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /users/me:
+    get:
+      tags:
+        - Users
+      summary: Saját felhasználó lekérése
+      description: Lekérdezi a bejelentkezett felhasználó adatait
+      responses:
+        '200':
+          description: Sikeresen visszaadott felhasználó adatok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '403':
+          description: Hozzáférés megtagadva
+      security:
+        - bearerAuth: []
+  /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Felhasználó lekérése ID alapján
+      description: Lekérdezi egy felhasználó adatait azonosító alapján
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: A felhasználó azonosítója
+      responses:
+        '200':
+          description: Sikeresen visszaadott felhasználó adatok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    patch:
+      tags:
+        - Users
+      summary: Felhasználó szerkesztése ID alapján
+      description: Szerkeszt egy felhasználót azonosító alapján
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: A felhasználó azonosítója
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditUser'
+      responses:
+        '200':
+          description: A felhasználó sikeresen szerkesztve
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    delete:
+      tags:
+        - Users
+      summary: Felhasználó törlése ID alapján
+      description: Töröl egy felhasználót azonosító alapján
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: A felhasználó azonosítója
+      responses:
+        '204':
+          description: A felhasználó sikeresen törölve
+#Könyvek kezelése          
+  /books:
+    get:
+      tags:
+        - Books
+      summary: Összes könyv lekérése
+      responses:
+        '200':
+          description: Sikeresen visszaadott könyvek
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+    post:
+      tags:
+        - Books
+      summary: Új könyv létrehozása
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewBook'
+      responses:
+        '201':
+          description: A könyv sikeresen létrehozva
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+  /books/{id}:
+    get:
+      tags:
+        - Books
+      summary: Könyv lekérése ID alapján
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: A könyv azonosítója
+      responses:
+        '200':
+          description: Sikeresen visszaadott könyv adatok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+    patch:
+      tags:
+        - Books
+      summary: Könyv szerkesztése ID alapján
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: A könyv azonosítója
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditBook'
+      responses:
+        '200':
+          description: A könyv sikeresen szerkesztve
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+    delete:
+      tags:
+        - Books
+      summary: Könyv törlése ID alapján
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: A könyv azonosítója
+      responses:
+        '204':
+          description: A könyv sikeresen törölve
+  /books/{bookid}/reviews:
+    get:
+      tags:
+        - Reviews
+      summary: Könyv értékeléseinek lekérése
+      parameters:
+        - name: bookid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: A könyv azonosítója
+      responses:
+        '200':
+          description: Sikeresen visszaadott értékelések
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+    post:
+      tags:
+        - Reviews
+      summary: Új értékelés létrehozása könyvhöz
+      parameters:
+        - name: bookid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: A könyv azonosítója
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewReview'
+      responses:
+        '201':
+          description: Az értékelés sikeresen létrehozva
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+      security:
+        - bearerAuth: []
+  /books/{bookid}/reviews-average:
+    get:
+      tags:
+        - Reviews
+      summary: Könyv átlagos értékelésének lekérése
+      parameters:
+        - name: bookid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: A könyv azonosítója
+      responses:
+        '200':
+          description: Sikeresen visszaadott átlagos értékelés
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  averageRating:
+                    type: number
+                    format: float
+                    description: A könyv átlagos értékelése  
+#Értékelések kezelése                    
+  /reviews/{id}:
+    patch:
+      tags:
+        - Reviews
+      summary: Értékelés szerkesztése ID alapján
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Az értékelés azonosítója
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditReview'
+      responses:
+        '200':
+          description: Az értékelés sikeresen szerkesztve
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - Reviews
+      summary: Értékelés törlése ID alapján
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Az értékelés azonosítója
+      responses:
+        '204':
+          description: Az értékelés sikeresen törölve
+      security:
+        - bearerAuth: []
+
+
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: A felhasználó neve
+        password:
+          type: string
+          description: A felhasználó jelszava
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        password:
+          type: string  
+    NewUser:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: A felhasználó neve
+        password:
+          type: string
+          description: A felhasználó jelszava
+    EditUser:
+      type: object
+      properties:
+        username:
+          type: string
+          description: A felhasználó neve
+        password:
+          type: string
+          description: A felhasználó jelszava
+    Book:
+      type: object
+      properties:
+        id:
+          type: string
+          description: A könyv azonosítója
+        title:
+          type: string
+          description: A könyv címe
+        author:
+          type: string
+          description: A könyv szerzője
+    NewBook:
+      type: object
+      required:
+        - title
+        - author
+      properties:
+        title:
+          type: string
+          description: A könyv címe
+        author:
+          type: string
+          description: A könyv szerzője
+    EditBook:
+      type: object
+      properties:
+        title:
+          type: string
+          description: A könyv címe
+        author:
+          type: string
+          description: A könyv szerzője
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Az értékelés azonosítója
+        bookId:
+          type: string
+          description: A könyv azonosítója
+        rating:
+          type: integer
+          format: int32
+          description: Az értékelés pontszáma
+        comment:
+          type: string
+          description: Az értékelés szövege
+    NewReview:
+      type: object
+      required:
+        - rating
+        - comment
+      properties:
+        rating:
+          type: integer
+          format: int32
+          description: Az értékelés pontszáma
+        comment:
+          type: string
+          description: Az értékelés szövege
+    EditReview:
+      type: object
+      properties:
+        rating:
+          type: integer
+          format: int32
+          description: Az értékelés pontszáma
+        comment:
+          type: string
+          description: Az értékelés szövege
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

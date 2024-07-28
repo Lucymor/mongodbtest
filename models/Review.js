@@ -9,7 +9,7 @@ const reviewSchema = new Schema({
         min: 1,
         max: 5,
     },
-    text: {
+    comment: {
         type: String,
         required: true,
         minLength: 50,

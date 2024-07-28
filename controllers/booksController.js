@@ -46,7 +46,7 @@ export const handleNewReview = async (req, res) => {
     if (!book) {
         return res.sendStatus(404);
     }
-    const review = await Review.create({ rating: req.body.rating, text: req.body.text, user: user, book: book });
+    const review = await Review.create({ rating: req.body.rating, comment: req.body.comment, user: user, book: book });
     user.reviews.push(review);
     user.save();
     book.reviews.push(review);

@@ -12,8 +12,8 @@ export const handleEditReview = async (req, res) => {
     if (req.body.rating) {
         review.rating = req.body.rating;
     }
-    if (req.body.text) {
-        review.text = req.body.text;
+    if (req.body.comment) {
+        review.comment = req.body.comment;
     }
     await review.save();
     res.send(review).status(200);
