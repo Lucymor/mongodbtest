@@ -51,7 +51,7 @@ export const handleNewReview = async (req, res) => {
     user.save();
     book.reviews.push(review);
     book.save();
-    res.send(review.depopulate).status(200);
+    res.send(review.depopulate()).status(200);
 };
 
 export const handleEditBook = async (req, res) => {
