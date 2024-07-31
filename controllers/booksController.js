@@ -18,17 +18,11 @@ export const handleGetAllReviewsByBookId = async (req, res) => {
 };
 
 export const handleGetReviewAvarageByBookId = async (req, res) => {
-    const book = await Book.findById(req.params.bookid)
-        .populate('reviews')
-        .exec();
+    const book = await Book.findById(req.params.bookid).populate('reviews').exec();
     if (!book) return res.sendStatus(404);
     let sum = 0;
-    sum = book.reviews
-        .map((review) => review.stars)
-        .reduce((ratingA, ratingB) => ratingA + ratingB, 0);
-
+    sum = book.reviews.map((review) => review.rating).reduce((ratingA, ratingB) => ratingA + ratingB, 0);
     const average = sum / book.reviews.length;
-
     res.send({ average }).status(200);
 };
 
