@@ -1,3 +1,4 @@
+import { Book } from '../models/Book.js';
 import { Review } from '../models/Review.js';
 import { User } from '../models/User.js';
 
@@ -30,6 +31,13 @@ export const handleDeleteReview = async (req, res) => {
         console.log(user._id, review.user);
         return res.sendStatus(403);
     }
+    user.reviews = user.reviews.filter((rev) => !rev._id.equals(review._id));
+    await user.save();
+
+    const book = await Book.findById(review.book).exec();
+    book.reviews = book.reviews.filter((rev) => !rev._id.equals(review._id));
+    await book.save();
+
     await review.deleteOne();
     res.sendStatus(204);
 };
